@@ -1,0 +1,100 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+}
+
+#game-board {
+    display: grid;
+    grid-template-columns: repeat(20, 30px);
+    grid-template-rows: repeat(20, 30px);
+    gap: 1px;
+    margin-top: 20px;
+    justify-content: center;
+    border: 2px solid #000;
+}
+
+.cell {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s ease;
+}
+
+button {
+    margin-top: 20px;
+    padding: 10px;
+    font-size: 16px;
+}
+
+/* Màu nền cho ô X và O */
+.cell.x {
+    background-color: #eaa9c7;
+}
+
+.cell.o {
+    background-color: #f9e386;
+}
+
+/* Hiệu ứng pháo hoa */
+#fireworks-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 1000;
+    display: none;
+}
+
+.firework {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0;
+    transform: scale(0);
+    animation: fireworks 1.5s forwards;
+}
+
+@keyframes fireworks {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.5;
+        transform: scale(1.5);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(3);
+    }
+}
+
+/* Hiệu ứng zig-zag */
+@keyframes zigzag {
+    0% {
+        background-color: #eaa9c7;
+    }
+    25% {
+        background-color: #f9e386;
+    }
+    50% {
+        background-color: #eaa9c7;
+    }
+    75% {
+        background-color: #f9e386;
+    }
+    100% {
+        background-color: #eaa9c7;
+    }
+}
+
+.zigzag {
+    animation: zigzag 1s ease forwards;
+}
