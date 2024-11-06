@@ -3,6 +3,7 @@ let currentPlayer = 'X';
 let gameOver = false;
 const boardSize = 20; // 20x20 board
 const winCondition = 5; // 5 in a row to win
+let winningCells = [];
 
 // Tạo bảng game 20x20
 function createBoard() {
@@ -38,7 +39,8 @@ function makeMove(row, col) {
         document.getElementById('status').textContent = `Người chơi ${currentPlayer} thắng!`;
         gameOver = true;
         triggerFireworks(); // Bắn pháo hoa
-        triggerZigzagEffect(); // Hiệu ứng zig-zag
+        triggerFlashEffect(winningCells); // Hiệu ứng chớp nháy
+        boldWinningCells(winningCells); // Đậm chữ cho các ô chiến thắng
     } else if (board.flat().every(cell => cell !== '')) {
         document.getElementById('status').textContent = "Hòa!";
         gameOver = true;
@@ -51,41 +53,49 @@ function makeMove(row, col) {
 
 // Kiểm tra xem người chơi có thắng không (5 ô liên tiếp)
 function checkWin(row, col) {
-    return (
-        checkDirection(row, col, 1, 0) || // Kiểm tra hàng
-        checkDirection(row, col, 0, 1) || // Kiểm tra cột
-        checkDirection(row, col, 1, 1) || // Kiểm tra chéo chính
-        checkDirection(row, col, 1, -1)   // Kiểm tra chéo phụ
-    );
-}
+    const directions = [
+        [1, 0], // Hướng ngang
+        [0, 1], // Hướng dọc
+        [1, 1], // Hướng chéo chính
+        [1, -1] // Hướng chéo phụ
+    ];
 
-// Kiểm tra theo hướng (dx, dy)
-function checkDirection(row, col, dx, dy) {
-    let count = 1;
+    for (let [dx, dy] of directions) {
+        const cells = [];
+        let count = 1;
 
-    // Kiểm tra theo hướng dương
-    for (let i = 1; i < winCondition; i++) {
-        const newRow = row + dx * i;
-        const newCol = col + dy * i;
-        if (newRow >= 0 && newRow < boardSize && newCol >= 0 && newCol < boardSize && board[newRow][newCol] === currentPlayer) {
-            count++;
-        } else {
-            break;
+        // Kiểm tra theo hướng dương
+        cells.push({ row, col });
+        for (let i = 1; i < winCondition; i++) {
+            const newRow = row + dx * i;
+            const newCol = col + dy * i;
+            if (newRow >= 0 && newRow < boardSize && newCol >= 0 && newCol < boardSize && board[newRow][newCol] === currentPlayer) {
+                cells.push({ row: newRow, col: newCol });
+                count++;
+            } else {
+                break;
+            }
+        }
+
+        // Kiểm tra theo hướng âm
+        for (let i = 1; i < winCondition; i++) {
+            const newRow = row - dx * i;
+            const newCol = col - dy * i;
+            if (newRow >= 0 && newRow < boardSize && newCol >= 0 && newCol < boardSize && board[newRow][newCol] === currentPlayer) {
+                cells.push({ row: newRow, col: newCol });
+                count++;
+            } else {
+                break;
+            }
+        }
+
+        if (count >= winCondition) {
+            winningCells = cells;
+            return true;
         }
     }
 
-    // Kiểm tra theo hướng âm
-    for (let i = 1; i < winCondition; i++) {
-        const newRow = row - dx * i;
-        const newCol = col - dy * i;
-        if (newRow >= 0 && newRow < boardSize && newCol >= 0 && newCol < boardSize && board[newRow][newCol] === currentPlayer) {
-            count++;
-        } else {
-            break;
-        }
-    }
-
-    return count >= winCondition;
+    return false;
 }
 
 // Trigger fireworks effect
@@ -112,11 +122,19 @@ function createFirework(container) {
     setTimeout(() => firework.remove(), 1500);
 }
 
-// Hiệu ứng zig-zag khi kết thúc ván
-function triggerZigzagEffect() {
-    const cells = document.querySelectorAll('.cell');
+// Hiệu ứng chớp nháy nền cho ô chiến thắng
+function triggerFlashEffect(cells) {
     cells.forEach(cell => {
-        cell.classList.add('zigzag');
+        const cellElement = document.querySelector(`[data-row="${cell.row}"][data-col="${cell.col}"]`);
+        cellElement.classList.add('flash');
+    });
+}
+
+// Làm đậm chữ cho các ô chiến thắng
+function boldWinningCells(cells) {
+    cells.forEach(cell => {
+        const cellElement = document.querySelector(`[data-row="${cell.row}"][data-col="${cell.col}"]`);
+        cellElement.classList.add('bold');
     });
 }
 
@@ -125,6 +143,7 @@ function resetGame() {
     board = [];
     currentPlayer = 'X';
     gameOver = false;
+    winningCells = [];
     document.getElementById('status').textContent = `Lượt của người chơi ${currentPlayer}`;
     document.getElementById('game-board').innerHTML = '';
     createBoard();

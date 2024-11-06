@@ -76,6 +76,23 @@ button {
     }
 }
 
+/* Hiệu ứng chớp nháy nền cho ô chiến thắng */
+@keyframes flash {
+    0% {
+        background-color: red;
+    }
+    50% {
+        background-color: yellow;
+    }
+    100% {
+        background-color: red;
+    }
+}
+
+.flash {
+    animation: flash 0.5s 4; /* Chớp 4 lần */
+}
+
 /* Hiệu ứng zig-zag */
 @keyframes zigzag {
     0% {
@@ -97,4 +114,9 @@ button {
 
 .zigzag {
     animation: zigzag 1s ease forwards;
+}
+
+/* Làm đậm chữ cho các ô chiến thắng */
+.bold {
+    font-weight: bold;
 }
